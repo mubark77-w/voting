@@ -1,0 +1,34 @@
+{
+  "contracts/1_Storage.sol": {
+    "__sources__": {
+      "contracts/1_Storage.sol": {
+        "content": "// SPDX-License-Identifier: GPL-3.0\n\npragma solidity >=0.8.2 <0.9.0;\n\n/**\n * @title Storage\n * @dev Store & retrieve value in a variable\n * @custom:dev-run-script ./scripts/deploy_with_ethers.ts\n */\ncontract Storage {\n\n    uint256 number;\n\n    /**\n     * @dev Store value in variable\n     * @param num value to store\n     */\n    function store(uint256 num) public {\n        number = num;\n    }\n\n    /**\n     * @dev Return value \n     * @return value of 'number'\n     */\n    function retrieve() public view returns (uint256){\n        return number;\n    }\n}",
+        "file": "contracts/1_Storage.sol"
+      }
+    }
+  },
+  "contracts/vote.sol": {
+    "__sources__": {
+      "contracts/vote.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.30;\r\ncontract voteing {\r\n   struct voter{\r\n       uint8 id;\r\n       uint8 CandidateNumber;\r\n       string RealAddress;\r\n   }\r\n   voter[] public voters;\r\n   mapping(address => bool) public hasVoted;\r\n   address public owner;\r\n\r\n   constructor() {\r\n        owner = msg.sender;\r\n    }\r\n\r\n   modifier OnlyOwner() {\r\n        require(owner == msg.sender, \" only owner\");\r\n        _;\r\n    }\r\n\r\n   function number_of_voter() public view OnlyOwner returns (uint256) {\r\n       return voters.length;\r\n   }\r\n\r\n   function store(uint8 _id, uint8 _candidateNumber, string memory _realAddress) public OnlyOwner {\r\n       voters.push(voter(_id, _candidateNumber, _realAddress));\r\n   }\r\n\r\n   function vote(uint8 _id, uint8 _candidateNumber, string memory _realAddress) public {\r\n       require(hasVoted[msg.sender], \"You have already voted!\");\r\n       hasVoted[msg.sender] = true;\r\n       store(_id, _candidateNumber, _realAddress);\r\n   }\r\n}\r\n",
+        "file": "contracts/vote.sol"
+      }
+    }
+  },
+  "contracts/voting.sol": {
+    "__sources__": {
+      "contracts/voting.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.30;\r\ncontract voteing{\r\n  struct Proposal {\r\n   uint256 id;\r\n   string proposal;\r\n   address Address;\r\n}\r\n\r\nProposal[] public proposals;\r\n   mapping(address => bool) public CanVoted;\r\n   address public owner;\r\n    constructor() {\r\n        owner = msg.sender;\r\n    }\r\n    modifier OnlyOwner() {\r\n        require(owner == msg.sender, \" only owner\");\r\n        _;\r\n    }\r\n    \r\n     function addProposal(uint256 _id, string memory _proposals, address _address) public OnlyOwner {\r\n   proposals.push(Proposal(_id, _proposals, _address));\r\n}\r\n     mapping(uint256 => uint256) public proposalVotes;\r\n\r\nfunction vote(uint256 proposal) public {\r\n    require(CanVoted[msg.sender], \"Already voted\");\r\n    CanVoted[msg.sender] = true;\r\n    proposalVotes[proposal]++;\r\n}\r\nmapping(uint256 => uint256) public votesCount;\r\nfunction getVotes(uint256 proposal) public view returns (uint256) {\r\n    return votesCount[proposal];\r\n}\r\nfunction getAllProposals() public view returns (Proposal[] memory) {\r\n    return proposals;\r\n}\r\n\r\n\r\nfunction hasVoted(address user) public view returns (bool) {\r\n    return CanVoted[user];\r\n}\r\n  function proposalCount() public view returns (uint256) {\r\n    return proposals.length;\r\n}\r\nmapping (address Proposal=> uint256 Proposaladdress) public numofProposal;\r\n\r\nfunction getWinner() public {\r\n    for (uint256 proposalIndex = 0; proposalIndex < proposals.length; proposalIndex++) {\r\n        address proposalAddress = proposals[proposalIndex].Address;\r\n        numofProposal[proposalAddress] = 0;\r\n    }\r\n}\r\nfunction getProposal(uint256 proposalId) public view returns (Proposal memory) {\r\n    return proposals[proposalId];\r\n}\r\n\r\n\r\n}",
+        "file": "contracts/voting.sol"
+      }
+    }
+  },
+  "contracts/Voting.sol": {
+    "__sources__": {
+      "contracts/Voting.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.30;\n\ncontract Voting {\n    struct Proposal {\n        uint256 id;\n        string name;\n        address proposer;\n        uint256 voteCount;\n    }\n\n    Proposal[] public proposals;\n    mapping(address => bool) public CanVoted ;\n    address public owner;\n\n    \n\n    constructor() {\n        owner = msg.sender;\n    }\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"Only owner can call this function\");\n        _;\n    }\n\n    function addProposal(uint256 _id, string memory _name , address _proposer ) public onlyOwner {\n        require(_id == proposals.length, \"Invalid proposal ID\");\n        proposals.push(Proposal({\n    id: _id,\n    name: _name,\n    proposer: _proposer,\n    voteCount: 0\n}));\n        \n    }\n\n    function vote(uint256 proposalId) public {\n        require(CanVoted[msg.sender], \"Already voted\");\n        CanVoted[msg.sender] = true;\n        proposals[proposalId].voteCount++;\n        \n    }\n    function getVotes(uint proposalId) public view returns (uint) {\n        return proposals[proposalId].voteCount;\n}\n\n    function getAllProposals() public view returns (Proposal[] memory) {\n        return proposals;\n}\n\nmapping(address => uint256) public numofProposal;\n   function proposalCount() public {\n    for (uint256 proposalindex = 0; proposalindex < proposals.length; proposalindex++) {\n        address proposer = proposals[proposalindex].proposer;\n        numofProposal[proposer] = 0;\n    }\n}\n\n    function getWinner() public view returns (Proposal memory) {\n        require(proposals.length > 0, \"No proposals exist\");\n        Proposal memory winner = proposals[0];\n        for (uint256 i = 1; i < proposals.length; i++) {\n            if (proposals[i].voteCount > winner.voteCount) {\n                winner = proposals[i];\n            }\n        }\n        return winner;\n    }\n     function getProposal(uint256 proposalId) public view returns (Proposal memory) {\n        require(proposalId < proposals.length, \"Invalid proposal ID\");\n        return proposals[proposalId];\n}\n\n    \n\n    function closeVoting() public view onlyOwner {\n        (block.timestamp);\n\n}\n    function resetVoting() public onlyOwner {\n    for (uint256 i = 0; i < proposals.length; i++) {\n        proposals[i].voteCount = 0;\n\n    }\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n}",
+        "file": "contracts/Voting.sol"
+      }
+    }
+  }
+}
