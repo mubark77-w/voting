@@ -7,7 +7,7 @@ contract Voting {
         string name;
         address proposer;
         uint256 voteCount;
-    }
+    } 
 
     Proposal[] public proposals;
     mapping(address => bool) public CanVoted ;
