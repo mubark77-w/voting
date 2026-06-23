@@ -6,7 +6,7 @@ contract Voting {
         uint256 id;
         string name;
         address proposer;
-        uint256 voteCount;
+        uint256 voteCount; 
     } 
 
     Proposal[] public proposals;
